@@ -96,9 +96,9 @@
           </a>
         </li>
         <li>
-          <a
-            href="#"
+          <div
             class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            @click="logout"
           >
             <svg
               class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -115,46 +115,82 @@
                 d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3"
               />
             </svg>
-            <span class="flex-1 ms-3 whitespace-nowrap">Cerrrar sesión</span>
-          </a>
+            <span class="flex-1 ms-3 whitespace-nowrap">Cerrar sesión</span>
+          </div>
         </li>
       </ul>
     </div>
   </aside>
 
-  <div class="p-4 sm:ml-64">
+  <div class="flex flex-row justify-around p-4 sm:ml-64">
     <div
-      v-for="employee in employees"
-      :key="employee.id"
-      class="block max-w-sm p-1 mb-4 bg-white border border-gray-200 rounded-lg shadow"
+      class="block max-w-sm p-4 mb-4 h-full bg-blue-300 border border-gray-200 rounded-lg shadow"
     >
-      <p>Mis Tareas</p>
-      <div v-for="task in employee.tasks" :key="task.id">
-        <div
-          class="block max-w-sm p-1 mb-1 bg-white border border-gray-200 rounded-lg shadow"
-        >
-          <p><strong>Tarea:</strong> {{ task.task }}</p>
-          <p><strong>Detalles:</strong> {{ task.details }}</p>
-          <p><strong>Status:</strong> {{ task.status }}</p>
+      <div
+        class="block max-w-sm p-2 mb-4 bg-green-200 border border-gray-200 rounded-lg shadow"
+      >
+        <p>Mis Tareas</p>
+        <div v-if="employeeData.length >= 1">
+          <div v-for="task in employeeData" :key="task.id">
+            <div
+              class="block max-w-sm p-1 mb-2 bg-white border border-gray-200 rounded-lg shadow"
+            >
+              <p><strong>Tarea:</strong> {{ task.task }}</p>
+              <p><strong>Detalles:</strong> {{ task.details }}</p>
+              <p><strong>Status:</strong> 
+<button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Dropdown button <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+</svg>
+</button>
+
+<!-- Dropdown menu -->
+<div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+      <li>
+        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dashboard</a>
+      </li>
+      <li>
+        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a>
+      </li>
+      <li>
+        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Earnings</a>
+      </li>
+      <li>
+        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Sign out</a>
+      </li>
+    </ul>
+</div>
+<!-- {{ task.status }} -->
+</p>
+            </div>
+          </div>
         </div>
+        <p
+          v-else
+          class="block max-w-sm p-1 mb-2 bg-white border border-gray-200 rounded-lg shadow"
+        >
+          {{ console.log("Hola") }}No hay tareas disponibles para este empleado.
+        </p>
       </div>
     </div>
-  </div>
 
-  <div class="p-4 sm:ml-64">
     <div
-      v-for="employee in employees"
-      :key="employee.id"
-      class="block max-w-sm p-1 mb-4 bg-white border border-gray-200 rounded-lg shadow"
+      class="block max-w-sm p-4 mb-4 bg-gray-400 border border-gray-200 rounded-lg shadow"
     >
-      <p><strong>Nombre:</strong> {{ employee.name }}</p>
-      <div v-for="task in employee.tasks" :key="task.id">
-        <div
-          class="block max-w-sm p-1 mb-1 bg-white border border-gray-200 rounded-lg shadow"
-        >
-          <p><strong>Tarea:</strong> {{ task.task }}</p>
-          <p><strong>Detalles:</strong> {{ task.details }}</p>
-          <p><strong>Status:</strong> {{ task.status }}</p>
+      <div
+        v-for="employee in employees"
+        :key="employee.id"
+        class="block max-w-sm p-2 mb-4 bg-green-200 border border-gray-200 rounded-lg shadow"
+      >
+        <p><strong>Nombre:</strong> {{ employee.name }}</p>
+        <div v-for="task in employee.tasks" :key="task.id">
+          <div
+            class="block max-w-sm p-1 mb-2 bg-white border border-gray-200 rounded-lg shadow"
+          >
+            <p><strong>Tarea:</strong> {{ task.task }}</p>
+            <p><strong>Detalles:</strong> {{ task.details }}</p>
+            <p><strong>Status:</strong> {{ task.status }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -168,12 +204,55 @@ export default {
   data() {
     return {
       employees: [],
+      employeeData: [],
     };
   },
   mounted() {
     this.fetchEmployeesTasks();
+    this.fetchEmployeeData();
   },
   methods: {
+    async logout() {
+      try {
+        const token = $cookies.get("Authorization");
+        await axios.post("http://localhost:8000/api/logout", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log("logout successful");
+
+        this.$cookies.remove("Authorization");
+      } catch (error) {
+        console.error("Error al cerrar sesión:", error);
+      }
+    },
+
+    async fetchEmployeeData() {
+      try {
+        const token = $cookies.get("Authorization");
+        const response = await axios.get(
+          "http://localhost:8000/api/employeeTasks",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        this.employeeData = response.data.data[0].tasks.map((task) => ({
+          id: task.id,
+          task: task.task,
+          details: task.details,
+          status: task.status,
+        }));
+        console.log(this.employeeData.length);
+      } catch (error) {
+        console.error("Error al obtener las tareas de los empleados:", error);
+      }
+    },
+
     async fetchEmployeesTasks() {
       try {
         const token = $cookies.get("Authorization");
@@ -186,7 +265,6 @@ export default {
           }
         );
 
-        // Modificar la estructura de los datos para asegurar que las tareas se asignen correctamente a los empleados
         this.employees = response.data.data.map((employee) => ({
           id: employee.id,
           name: employee.name,

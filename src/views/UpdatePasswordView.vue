@@ -2,23 +2,24 @@
   <div class="flex items-center justify-center w-full h-screen">
     <div class="w-full max-w-sm">
       <form
-        @submit.prevent="login"
+        @submit.prevent="changePassword"
         class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
       >
-        <h1 class="text-center mb-4 font-bold">INICIO DE SESION</h1>
+        <h1 class="text-center mb-4 font-bold">CAMBIAR CONTRASEÑA</h1>
+
         <div class="mb-4">
           <label
             class="block text-gray-700 text-sm font-semibold mb-2"
             for="username"
           >
-            Email
+            Contraseña
           </label>
           <input
-            v-model="email"
+            v-model="password"
             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="username"
-            type="email"
-            placeholder="email@ejemplo.com"
+            type="password"
+            placeholder="******************"
           />
         </div>
         <div class="flex flex-col mb-6">
@@ -26,34 +27,23 @@
             class="block text-gray-700 text-sm font-semibold mb-2"
             for="password"
           >
-            Contraseña
+            Repetir contraseña
           </label>
           <input
-            v-model="password"
+            v-model="repeatPassword"
             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
             id="password"
             type="password"
             placeholder="******************"
           />
-          <router-link
-            to="/welcome"
-            class="flex items-center text-center justify-center lg:inline-block lg:mt-0 text-gray-400 hover:text-gray-700 text-xs"
-            >Haz click aqui si aun no tienes contraseña</router-link
-          >
         </div>
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-center">
           <button
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"
           >
-            Iniciar sesión
+            Enviar
           </button>
-          <router-link
-            class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
-            to="/welcome"
-          >
-            ¿Olvidaste tu contraseña?
-          </router-link>
         </div>
       </form>
     </div>
@@ -65,30 +55,33 @@
 import axios from "axios";
 
 export default {
-  name: "LoginView",
+  name: "UpdatePasswordView",
   data() {
     return {
-      email: "",
       password: "",
+      repeatPassword: "",
     };
   },
   methods: {
-    async login() {
-      try {
-        const response = await axios.post("http://localhost:8000/api/login", {
-          email: this.email,
-          password: this.password,
-        });
-
-        if (response.data.token) {
-          $cookies.set("Authorization", response.data.token);
-        } else {
-          console.error(
-            "Error: No se recibió un token de sesión en la respuesta"
+    async changePassword() {
+      console.log(
+        this.$route.query.token,
+        this.$route.query.email,
+        this.password
+      );
+      if (this.password === this.repeatPassword) {
+        try {
+          const response = await axios.put(
+            "http://localhost:8000/api/updatePassword",
+            {
+              password: this.password,
+              token: this.$route.query.token,
+              email: this.$route.query.email,
+            }
           );
+        } catch (error) {
+          console.error("Error al cambiar la contraseña:", error);
         }
-      } catch (error) {
-        console.error("Error al iniciar sesión:", error);
       }
     },
   },
