@@ -1,20 +1,33 @@
 <template>
-  <nav>
-    <router-link
-      to="/login"
-      class="block ml-4 mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white"
-      >Login</router-link
-    >
-    <router-link
-      to="/"
-      class="block ml-4 mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white"
-      >HomeView</router-link
-    >
-    <router-link
-      to="/welcome"
-      class="block ml-4 mt-4 lg:inline-block lg:mt-0 hover:text-white"
-      >Welcome</router-link
-    >
-  </nav>
   <router-view />
 </template>
+
+<script>
+import axios from "axios";
+import { mapMutations } from "vuex";
+
+export default {
+  components: {},
+  mounted() {
+    this.meUser();
+  },
+  methods: {
+    ...mapMutations(["setUser"]),
+
+    async meUser() {
+      try {
+        const token = $cookies.get("Authorization");
+        const response = await axios.get("http://localhost:8000/api/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        this.setUser((this.user = response.data.user));
+        this.$router.push({ name: "tasks" });
+      } catch {
+        this.$router.push("/login");
+      }
+    },
+  },
+};
+</script>

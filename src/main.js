@@ -6,6 +6,7 @@ import "./assets/tailwind.css";
 import PrimeVue from "primevue/config";
 import Lara from "./presets/lara";
 import VueCookies from "vue-cookies";
+import VueRouter from "vue-router";
 
 // createApp(App).use(store).use(router).mount('#app')
 
