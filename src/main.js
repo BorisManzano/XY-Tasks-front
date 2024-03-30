@@ -7,8 +7,8 @@ import PrimeVue from "primevue/config";
 import Lara from "./presets/lara";
 import VueCookies from "vue-cookies";
 import VueRouter from "vue-router";
-
-// createApp(App).use(store).use(router).mount('#app')
+import VueDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 
 const app = createApp(App)
   .use(VueCookies, { expires: "1d", path: "/" })
@@ -18,4 +18,5 @@ const app = createApp(App)
     unstyled: true,
     pt: Lara,
   })
+  .component("VueDatePicker", VueDatePicker)
   .mount("#app");

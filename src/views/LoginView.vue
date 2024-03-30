@@ -5,7 +5,7 @@
     <div class="w-full max-w-sm">
       <form
         @submit.prevent="login"
-        class="bg-[#fa798f] shadow-md rounded px-8 pt-6 pb-8 mb-4"
+        class="bg-[#fa798f] shadow-md rounded-lg px-8 pt-6 pb-8 mb-4"
       >
         <h1 class="text-center text-white mb-4 font-bold">INICIO DE SESIÓN</h1>
         <div class="mb-4">
@@ -38,7 +38,7 @@
             placeholder="******************"
           />
           <router-link
-            to="/welcome"
+            to="/recoverPassword"
             class="flex items-center text-center justify-center lg:inline-block lg:mt-0 text-white hover:text-gray-700 text-xs"
             >Haz click aqui si aun no tienes contraseña</router-link
           >
@@ -52,7 +52,7 @@
           </button>
           <router-link
             class="inline-block align-baseline font-bold text-sm text-white hover:text-gray-700"
-            to="/welcome"
+            to="/recoverPassword"
           >
             ¿Olvidaste tu contraseña?
           </router-link>

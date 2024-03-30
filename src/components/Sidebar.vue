@@ -107,7 +107,7 @@
         </li>
         <li>
           <div
-            class="flex items-center p-2 text-[#f43f60] rounded-lg hover:bg-[#f43f60] hover:text-white group"
+            class="flex items-center cursor-pointer p-2 text-[#f43f60] rounded-lg hover:bg-[#f43f60] hover:text-white group"
             @click="logout"
           >
             <svg
@@ -189,13 +189,20 @@ export default {
     async logout() {
       try {
         const token = $cookies.get("Authorization");
-        await axios.post("http://localhost:8000/api/logout", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        await axios.post(
+          "http://localhost:8000/api/logout",
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
         this.$cookies.remove("Authorization");
-        this.$router.push("/login");
+        this.$nextTick(() => {
+          this.$router.push("/login");
+        });
       } catch (error) {
         console.error("Error al cerrar sesión:", error);
       }

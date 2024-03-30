@@ -40,7 +40,7 @@ const routes = [
     component: Login,
   },
   {
-    path: "/welcome",
+    path: "/recoverPassword",
     name: "Welcome",
     component: Welcome,
   },
