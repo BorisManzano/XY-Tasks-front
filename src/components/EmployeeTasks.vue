@@ -63,28 +63,28 @@
                   >
                     <ul class="flex flex-col text-start font-medium text-sm">
                       <li
-                        @click="selectStatus(task, 'Pendiente')"
+                        @click="selectStatus(task, task.id, 'Pendiente')"
                         class="hover:bg-[#ff224b] pl-2 py-1 cursor-pointer hover:text-white rounded-md"
                       >
                         <a>Pendiente</a>
                       </li>
                       <li
-                        @click="selectStatus(task, 'Completado')"
+                        @click="selectStatus(task, task.id, 'En proceso')"
+                        class="hover:bg-[#ff224b] pl-2 py-1 cursor-pointer hover:text-white rounded-md"
+                      >
+                        <a href="#">En proceso</a>
+                      </li>
+                      <li
+                        @click="selectStatus(task, task.id, 'Completado')"
                         class="hover:bg-[#ff224b] pl-2 py-1 cursor-pointer hover:text-white rounded-md"
                       >
                         <a href="#">Completado</a>
                       </li>
                       <li
-                        @click="selectStatus(task, 'Bloqueado')"
+                        @click="selectStatus(task, task.id, 'Bloqueado')"
                         class="hover:bg-[#ff224b] pl-2 py-1 cursor-pointer hover:text-white rounded-md"
                       >
                         <a href="#">Bloqueado</a>
-                      </li>
-                      <li
-                        @click="selectStatus(task, 'En proceso')"
-                        class="hover:bg-[#ff224b] pl-2 py-1 cursor-pointer hover:text-white rounded-md"
-                      >
-                        <a href="#">En proceso</a>
                       </li>
                     </ul>
                   </div>
@@ -94,7 +94,7 @@
             <transition name="modal">
               <div
                 v-if="activeModal === task.id"
-                class="fixed inset-0 bg-[#00000098] backdrop-blur-sm z-40 flex items-center justify-center"
+                class="absolute inset-0 bg-[#00000098] backdrop-blur-sm z-40 flex items-center justify-center"
               >
                 <div class="w-1/3 bg-white rounded-xl">
                   <div
@@ -123,15 +123,29 @@
                       </svg>
                     </button>
                   </div>
-                  <div
-                    v-if="task.comments !== null"
-                    class="p-4 flex flex-col items-start gap-4"
-                  >
+                  <div style="max-height: 35rem; overflow-y: scroll">
                     <div
-                      v-for="comment in task.comments"
-                      class="border-2 inline-block border-[#f43f60] rounded-lg p-2"
+                      v-if="taskComents !== null"
+                      class="p-4 flex flex-col items-start gap-4"
                     >
-                      <p class="text-[#f43f60] font-semibold">{{ comment }}</p>
+                      <div
+                        v-for="comment in taskComents"
+                        class="flex flex-row text-[#f43f60] gap-0.5"
+                      >
+                        <div
+                          class="flex flex-row border-[#f43f60] border-2 rounded-lg p-2"
+                        >
+                          <p class="font-semibold">
+                            {{ comment.comment }}
+                          </p>
+                        </div>
+                        <img
+                          src="../assets/trash.svg"
+                          alt="trash"
+                          width="20"
+                          height="20"
+                        />
+                      </div>
                     </div>
                   </div>
                   <hr class="border-[#f43f60]" />
@@ -144,7 +158,7 @@
                       class="border-none focus:outline-none text-[#f43f60] p-2 rounded-lg w-full h-full"
                     />
                     <button
-                      @click="createComment(newComment)"
+                      @click="createComment(newComment, task.id)"
                       class="absolute top-4 right-2 fill-[#f43f60] text-[#f43f60] outline-[#f43f60]"
                     >
                       <svg
@@ -187,6 +201,7 @@ export default {
   name: "EmployeeTasks",
   data() {
     return {
+      taskComents: [],
       newComment: "",
       employeeData: [],
       activeDropdown: null,
@@ -207,30 +222,108 @@ export default {
         this.activeDropdown = taskId;
       }
     },
+
     openModal(taskId) {
       if (this.activeModal === taskId) {
         this.activeModal = null;
       } else {
+        this.allComments(taskId);
         this.activeModal = taskId;
       }
     },
-    selectStatus(task, status) {
+
+    async selectStatus(task, id, status) {
       task.status = status;
-      this.toggleDropdown(task.id);
-      // axios
-    },
-    async createComment(comment) {
       try {
-        // const response = await axios.post('')
-        console.log(comment);
-        this.newComment = "";
-      } catch {}
+        const token = $cookies.get("Authorization");
+        const response = await axios.put(
+          `${process.env.VUE_APP_API_BASE_URL}changeStatus`,
+          {
+            id: id,
+            status: status,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        this.toggleDropdown(id);
+      } catch (error) {
+        console.error("Error al actualizar el estado de la tarea:", error);
+      }
     },
+
+    async allComments(id) {
+      console.log(id);
+      try {
+        const token = $cookies.get("Authorization");
+        const response = await axios.get(
+          `${process.env.VUE_APP_API_BASE_URL}allComments/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        this.taskComents = response.data;
+        console.log(this.taskComents);
+      } catch (error) {
+        console.error("Error al obtener los comentarios:", error);
+      }
+    },
+
+    async createComment(comment, id, files) {
+      try {
+        const token = $cookies.get("Authorization");
+        const response = await axios.post(
+          `${process.env.VUE_APP_API_BASE_URL}newComment`,
+          {
+            comment: comment,
+            task_id: id,
+            files: files,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        this.allComments(id);
+        this.newComment = "";
+      } catch (error) {
+        console.error("Error al crear el comentario", error);
+      }
+    },
+
+    async deleteComment(id) {
+      const token = $cookies.get("Authorization");
+      try {
+        const response = await axios.delete(
+          `${process.env.VUE_APP_API_BASE_URL}deleteComment/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        this.employeeData = response.data.data[0].tasks.map((task) => ({
+          id: task.id,
+          task: task.task,
+          details: task.details,
+          status: task.status,
+          comments: task.comments,
+        }));
+      } catch (error) {
+        console.error("Error al obtener las tareas de los empleados:", error);
+      }
+    },
+
     async fetchEmployeeData() {
       try {
         const token = $cookies.get("Authorization");
         const response = await axios.get(
-          "http://localhost:8000/api/employeeTasks",
+          `${process.env.VUE_APP_API_BASE_URL}employeeTasks`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
