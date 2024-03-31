@@ -125,11 +125,11 @@
                   </div>
                   <div style="max-height: 35rem; overflow-y: scroll">
                     <div
-                      v-if="taskComents !== null"
+                      v-if="taskComments !== null"
                       class="p-4 flex flex-col items-start gap-4"
                     >
                       <div
-                        v-for="comment in taskComents"
+                        v-for="comment in taskComments"
                         class="flex flex-row text-[#f43f60] gap-0.5"
                       >
                         <div
@@ -139,12 +139,21 @@
                             {{ comment.comment }}
                           </p>
                         </div>
-                        <img
-                          src="../assets/trash.svg"
-                          alt="trash"
-                          width="20"
-                          height="20"
-                        />
+                        <button
+                          v-if="
+                            user.role === 'super_admin' ||
+                            user.id === comment.user_id ||
+                            user.id === task.user_id
+                          "
+                          @click="deleteComment(comment.id, task.id)"
+                        >
+                          <img
+                            src="../assets/trash.svg"
+                            alt="trash"
+                            width="20"
+                            height="20"
+                          />
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -201,7 +210,7 @@ export default {
   name: "EmployeeTasks",
   data() {
     return {
-      taskComents: [],
+      taskComments: [],
       newComment: "",
       employeeData: [],
       activeDropdown: null,
@@ -266,8 +275,8 @@ export default {
             },
           }
         );
-        this.taskComents = response.data;
-        console.log(this.taskComents);
+        this.taskComments = response.data;
+        console.log(this.taskComments);
       } catch (error) {
         console.error("Error al obtener los comentarios:", error);
       }
@@ -296,7 +305,7 @@ export default {
       }
     },
 
-    async deleteComment(id) {
+    async deleteComment(id, task_id) {
       const token = $cookies.get("Authorization");
       try {
         const response = await axios.delete(
@@ -307,15 +316,9 @@ export default {
             },
           }
         );
-        this.employeeData = response.data.data[0].tasks.map((task) => ({
-          id: task.id,
-          task: task.task,
-          details: task.details,
-          status: task.status,
-          comments: task.comments,
-        }));
+        this.allComments(task_id);
       } catch (error) {
-        console.error("Error al obtener las tareas de los empleados:", error);
+        console.error("Error al eliminar el comentario:", error);
       }
     },
 

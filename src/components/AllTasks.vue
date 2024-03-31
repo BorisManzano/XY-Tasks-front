@@ -128,17 +128,39 @@
                             </svg>
                           </button>
                         </div>
-                        <div
-                          v-if="task.comments !== null"
-                          class="p-4 flex flex-col items-start gap-4"
-                        >
+                        <div style="max-height: 35rem; overflow-y: scroll">
                           <div
-                            v-for="comment in task.comments"
-                            class="border-2 inline-block border-[#f43f60] rounded-lg p-2"
+                            v-if="taskComments !== null"
+                            class="p-4 flex flex-col items-start gap-4"
                           >
-                            <p class="text-[#f43f60] font-semibold">
-                              {{ comment }}
-                            </p>
+                            <div
+                              v-for="comment in taskComments"
+                              class="flex flex-row text-[#f43f60] gap-0.5"
+                            >
+                              <div
+                                class="flex flex-row border-[#f43f60] border-2 rounded-lg p-2"
+                              >
+                                <p class="text-[#f43f60] font-semibold">
+                                  {{ comment.comment }}
+                                </p>
+                              </div>
+                              {{ console.log(employee) }}
+                              <button
+                                v-if="
+                                  user.role === 'super_admin' ||
+                                  user.id === comment.user_id ||
+                                  user.id === employee.id
+                                "
+                                @click="deleteComment(comment.id, task.id)"
+                              >
+                                <img
+                                  src="../assets/trash.svg"
+                                  alt="trash"
+                                  width="20"
+                                  height="20"
+                                />
+                              </button>
+                            </div>
                           </div>
                         </div>
                         <hr class="border-[#f43f60]" />
@@ -150,6 +172,11 @@
                             type="text"
                             class="border-none focus:outline-none text-[#f43f60] p-2 rounded-lg w-full h-full"
                           />
+                          <button
+                            class="absolute top-4 right-2 fill-[#f43f60] text-[#f43f60] outline-[#f43f60]"
+                          >
+                            <Attach />
+                          </button>
                           <button
                             @click="createComment(newComment, task.id)"
                             class="absolute top-4 right-2 fill-[#f43f60] text-[#f43f60] outline-[#f43f60]"
@@ -193,15 +220,17 @@ import axios from "axios";
 import { mapState } from "vuex";
 import NewTaskForm from "./NewTaskForm.vue";
 import EmployeeTasks from "./EmployeeTasks.vue";
+import Attach from "../assets/attach.svg";
 
 export default {
   name: "AllTasks",
   data() {
     return {
+      taskComments: [],
+      newComment: "",
       employees: [],
       activeDropdown: null,
       activeModal: null,
-      newComment: "",
     };
   },
   computed: {
@@ -229,6 +258,7 @@ export default {
       if (this.activeModal === taskId) {
         this.activeModal = null;
       } else {
+        this.allComments(taskId);
         this.activeModal = taskId;
       }
     },
@@ -279,6 +309,42 @@ export default {
         console.error("Error al obtener las tareas de los empleados:", error);
       }
     },
+    async allComments(id) {
+      console.log(id);
+      try {
+        const token = $cookies.get("Authorization");
+        const response = await axios.get(
+          `${process.env.VUE_APP_API_BASE_URL}allComments/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        this.taskComments = response.data;
+        console.log(this.taskComments);
+      } catch (error) {
+        console.error("Error al obtener los comentarios:", error);
+      }
+    },
+
+    async deleteComment(id, task_id) {
+      const token = $cookies.get("Authorization");
+      try {
+        const response = await axios.delete(
+          `${process.env.VUE_APP_API_BASE_URL}deleteComment/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        this.allComments(task_id);
+      } catch (error) {
+        console.error("Error al eliminar el comentario:", error);
+      }
+    },
+
     async createComment(comment, id, files) {
       try {
         const token = $cookies.get("Authorization");
@@ -295,6 +361,7 @@ export default {
             },
           }
         );
+        this.allComments(id);
         this.newComment = "";
       } catch (error) {
         console.error("Error al crear el comentario", error);
