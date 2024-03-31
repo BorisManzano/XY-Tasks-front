@@ -132,7 +132,7 @@ export default {
       try {
         const token = $cookies.get("Authorization");
         const response = await axios.get(
-          "http://localhost:8000/api/allEmployeesTasks",
+          `${process.env.VUE_APP_API_BASE_URL}allEmployeesTasks`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

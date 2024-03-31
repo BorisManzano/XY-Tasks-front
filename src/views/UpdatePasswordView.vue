@@ -1,22 +1,24 @@
 <template>
-  <div class="flex items-center justify-center w-full h-screen">
+  <div
+    class="flex bg-gradient-to-t from-[#fa798f] to-[#f43f60] items-center justify-center w-full h-screen"
+  >
     <div class="w-full max-w-sm">
       <form
         @submit.prevent="changePassword"
-        class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+        class="bg-[#f64868] text-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
       >
         <h1 class="text-center mb-4 font-bold">CAMBIAR CONTRASEÑA</h1>
 
         <div class="mb-4">
           <label
-            class="block text-gray-700 text-sm font-semibold mb-2"
+            class="block text-white text-sm font-semibold mb-2"
             for="username"
           >
             Contraseña
           </label>
           <input
             v-model="password"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-[#f43f60] leading-tight focus:outline-none focus:shadow-outline"
             id="username"
             type="password"
             placeholder="******************"
@@ -24,14 +26,14 @@
         </div>
         <div class="flex flex-col mb-6">
           <label
-            class="block text-gray-700 text-sm font-semibold mb-2"
+            class="block text-white text-sm font-semibold mb-2"
             for="password"
           >
             Repetir contraseña
           </label>
           <input
             v-model="repeatPassword"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-[#f43f60] mb-3 leading-tight focus:outline-none focus:shadow-outline"
             id="password"
             type="password"
             placeholder="******************"
@@ -39,7 +41,7 @@
         </div>
         <div class="flex items-center justify-center">
           <button
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            class="bg-[#ff224b] hover:bg-pink-300 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"
           >
             Enviar
@@ -64,15 +66,10 @@ export default {
   },
   methods: {
     async changePassword() {
-      console.log(
-        this.$route.query.token,
-        this.$route.query.email,
-        this.password
-      );
       if (this.password === this.repeatPassword) {
         try {
           const response = await axios.put(
-            "http://localhost:8000/api/updatePassword",
+            `${process.env.VUE_APP_API_BASE_URL}updatePassword`,
             {
               password: this.password,
               token: this.$route.query.token,

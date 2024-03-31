@@ -1,21 +1,25 @@
 <template>
-  <div class="flex items-center justify-center w-full h-screen">
+  <div
+    class="flex bg-gradient-to-t from-[#fa798f] to-[#f43f60] items-center justify-center w-full h-screen"
+  >
     <div class="w-full max-w-sm">
-      <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <form
+        class="bg-[#f64868] text-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+      >
         <h1 class="flex justify-center font-bold mb-4">¡Ingrese su Email!</h1>
         <p class="flex justify-center text-center font-normal mb-4">
           Se le enviara un enlace para su nueva contraseña.
         </p>
         <div class="mb-4">
           <label
-            class="block text-gray-700 text-sm font-semibold mb-2"
+            class="block text-white text-sm font-semibold mb-2"
             for="username"
           >
             Email
           </label>
           <input
             v-model="email"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-[#f43f60] leading-tight focus:outline-none focus:shadow-outline"
             id="username"
             type="email"
             placeholder="email@ejemplo.com"
@@ -24,13 +28,13 @@
         <div class="flex items-center justify-between">
           <button
             @click="enviarEmail"
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            class="bg-[#ff224b] hover:bg-pink-300 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="button"
           >
             Enviar
           </button>
           <router-link
-            class="inline-block align-baseline font-bold text-sm text-gray-400 hover:text-gray-600"
+            class="inline-block align-baseline font-bold text-sm text-white hover:text-gray-300"
             to="/login"
           >
             Volver al login
@@ -57,7 +61,7 @@ export default {
       console.log(this.email);
       try {
         const response = await axios.post(
-          "http://localhost:8000/api/recoverPassword",
+          `${process.env.VUE_APP_API_BASE_URL}recoverPassword`,
           {
             email: this.email,
           }

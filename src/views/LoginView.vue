@@ -5,7 +5,7 @@
     <div class="w-full max-w-sm">
       <form
         @submit.prevent="login"
-        class="bg-[#fa798f] shadow-md rounded-lg px-8 pt-6 pb-8 mb-4"
+        class="bg-[#f64868] shadow-md rounded-lg px-8 pt-6 pb-8 mb-4"
       >
         <h1 class="text-center text-white mb-4 font-bold">INICIO DE SESIÓN</h1>
         <div class="mb-4">
@@ -45,7 +45,7 @@
         </div>
         <div class="flex items-center justify-between">
           <button
-            class="bg-[#f43f60] hover:bg-pink-300 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            class="bg-[#ff224b] hover:bg-pink-300 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"
           >
             Iniciar sesión
@@ -83,10 +83,13 @@ export default {
 
     async login() {
       try {
-        const response = await axios.post("http://localhost:8000/api/login", {
-          email: this.email,
-          password: this.password,
-        });
+        const response = await axios.post(
+          `${process.env.VUE_APP_API_BASE_URL}login`,
+          {
+            email: this.email,
+            password: this.password,
+          }
+        );
 
         if (response.data.token) {
           $cookies.set("Authorization", response.data.token);

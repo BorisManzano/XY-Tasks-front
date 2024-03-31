@@ -190,7 +190,7 @@ export default {
       try {
         const token = $cookies.get("Authorization");
         await axios.post(
-          "http://localhost:8000/api/logout",
+          `${process.env.VUE_APP_API_BASE_URL}logout`,
           {},
           {
             headers: {

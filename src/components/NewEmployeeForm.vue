@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="user.role === 'super_admin'"
-    class="block max-w-sm pb-4 h-full bg-[#fa798f] w-1/3 mt-20 rounded-lg shadow-2xl text-white"
+    class="block max-w-sm pb-4 h-full bg-[#f64868] w-1/3 mt-20 rounded-lg shadow-2xl text-white"
   >
     <div class="bg-white rounded-lg h-14 shadow-sm">
       <p
@@ -44,7 +44,7 @@
       <div class="flex items-center justify-center">
         <button
           @click="newEmployee()"
-          class="text-white text-center w-32 h-8 bg-[#f43f60] focus:ring-4 focus:outline-none focus:ring-[#f4a0af] font-medium rounded-lg text-sm inline-flex items-center justify-center"
+          class="text-white text-center w-32 h-8 bg-[#ff224b] focus:ring-4 focus:outline-none focus:ring-[#f4a0af] font-medium rounded-lg text-sm inline-flex items-center justify-center"
           type="button"
         >
           Crear
@@ -76,7 +76,7 @@ export default {
       const token = $cookies.get("Authorization");
       try {
         const response = await axios.post(
-          "http://localhost:8000/api/register",
+          `${process.env.VUE_APP_API_BASE_URL}register`,
           {
             name: this.name,
             email: this.email,
@@ -88,12 +88,11 @@ export default {
             },
           }
         );
-        console.log(response);
         this.name = "";
         this.email = "";
         this.role = "";
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
   },

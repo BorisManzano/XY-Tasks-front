@@ -12,7 +12,6 @@
     <div class="block w-full px-4 rounded-lg">
       <div class="flex flex-col" v-if="employeeData.length >= 1">
         <div v-for="task in employeeData" :key="task.id">
-          {{ console.log(task) }}
           <div class="flex flex-col w-full">
             <div
               class="relative flex flex-col justify-between shadow-lg min-h-36 p-4 my-4 rounded-lg bg-[#f64868]"
@@ -94,20 +93,36 @@
             </div>
             <transition name="modal">
               <div
-                @click="openModal(task.id)"
                 v-if="activeModal === task.id"
                 class="fixed inset-0 bg-[#00000098] backdrop-blur-sm z-40 flex items-center justify-center"
               >
                 <div class="w-1/3 bg-white rounded-xl">
                   <div
-                    class="flex justify-center items-center bg-[#f43f60] h-16 rounded-lg"
+                    class="flex justify-center items-center relative bg-[#f43f60] h-16 rounded-lg"
                   >
                     <h3 class="font-bold text-white text-xl">
                       Comentarios de {{ task.task }}
                     </h3>
+                    <button
+                      @click="openModal(task.id)"
+                      class="absolute right-4 top-100"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
                   </div>
-                  <p>boricua {{ task.comments }}</p>
-                  {{ console.log(task.comments) }}
                   <div
                     v-if="task.comments !== null"
                     class="p-4 flex flex-col items-start gap-4"
@@ -118,6 +133,35 @@
                     >
                       <p class="text-[#f43f60] font-semibold">{{ comment }}</p>
                     </div>
+                  </div>
+                  <hr class="border-[#f43f60]" />
+                  <div class="h-12 relative">
+                    <input
+                      placeholder="Escribir comentario"
+                      v-model="newComment"
+                      id="newComment"
+                      type="text"
+                      class="border-none focus:outline-none text-[#f43f60] p-2 rounded-lg w-full h-full"
+                    />
+                    <button
+                      @click="createComment(newComment)"
+                      class="absolute top-4 right-2 fill-[#f43f60] text-[#f43f60] outline-[#f43f60]"
+                    >
+                      <svg
+                        class="w-5 h-5"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                          stroke-linejoin="round"
+                          stroke-linecap="round"
+                        ></path>
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -143,6 +187,7 @@ export default {
   name: "EmployeeTasks",
   data() {
     return {
+      newComment: "",
       employeeData: [],
       activeDropdown: null,
       activeModal: null,
@@ -174,6 +219,13 @@ export default {
       this.toggleDropdown(task.id);
       // axios
     },
+    async createComment(comment) {
+      try {
+        // const response = await axios.post('')
+        console.log(comment);
+        this.newComment = "";
+      } catch {}
+    },
     async fetchEmployeeData() {
       try {
         const token = $cookies.get("Authorization");
@@ -185,7 +237,6 @@ export default {
             },
           }
         );
-
         this.employeeData = response.data.data[0].tasks.map((task) => ({
           id: task.id,
           task: task.task,
@@ -193,7 +244,6 @@ export default {
           status: task.status,
           comments: task.comments,
         }));
-        // console.log(this.employeeData[0].comments);
       } catch (error) {
         console.error("Error al obtener las tareas de los empleados:", error);
       }
