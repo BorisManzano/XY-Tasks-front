@@ -75,12 +75,12 @@ export default {
     showToast(res, boolean) {
       if (boolean) {
         return this.$swal.fire({
-          title: res,
-          icon: "success",
+          text: res,
           position: "top",
+          icon: "success",
         });
       } else {
-        return this.$swal.fire({ text: res, position: "top" });
+        return this.$swal.fire({ text: res, position: "top", icon: "error" });
       }
     },
 
@@ -100,9 +100,11 @@ export default {
             },
           }
         );
+
         this.name = "";
         this.email = "";
         this.role = "";
+        this.showToast("Usuario creado con éxito", true);
       } catch {
         this.showToast("Error al crear el usuario", false);
       }

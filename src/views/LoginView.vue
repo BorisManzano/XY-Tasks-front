@@ -85,11 +85,10 @@ export default {
       if (boolean) {
         return this.$swal.fire({
           title: res,
-          icon: "success",
           position: "top",
         });
       } else {
-        return this.$swal.fire({ text: res, position: "top" });
+        return this.$swal.fire({ text: res, position: "top", icon: "error" });
       }
     },
 

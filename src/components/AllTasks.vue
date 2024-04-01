@@ -10,13 +10,19 @@
         Tareas Totales
       </p>
     </div>
-    <div class="flex flex-col gap-8 w-full p-4 rounded-lg">
+    <div
+      class="flex flex-col gap-8 w-full p-4 rounded-lg"
+      v-if="employees.length >= 1"
+    >
       <div
         v-for="employee in employees"
         :key="employee.id"
         class="flex flex-col"
       >
-        <div class="block w-full p-4 rounded-lg shadow-xl bg-[#f64868]">
+        <div
+          v-if="employee.tasks.length >= 1"
+          class="block w-full p-4 rounded-lg shadow-xl bg-[#f64868]"
+        >
           <p class="font-bold text-center mb-4">{{ employee.name }}</p>
           <div v-for="(task, index) in employee.tasks" :key="task.id">
             <div
@@ -269,8 +275,10 @@
             />
           </div>
         </div>
+        <p v-else class="text-center p-4">No hay tareas</p>
       </div>
     </div>
+    <p v-else class="text-center p-4">No hay empleados</p>
   </div>
   <NewTaskForm v-if="user.role === 'super_admin'" />
 </template>
@@ -314,11 +322,10 @@ export default {
       if (boolean) {
         return this.$swal.fire({
           title: res,
-          icon: "success",
           position: "top",
         });
       } else {
-        return this.$swal.fire({ text: res, position: "top" });
+        return this.$swal.fire({ text: res, position: "top", icon: "error" });
       }
     },
 
@@ -328,6 +335,12 @@ export default {
 
     async createComment(taskId) {
       this.newComment.task_id = taskId;
+      if (!this.newComment.comment) {
+        return this.showToast(
+          "Para comentar debe ingresar un texto o descripción del archivo",
+          false
+        );
+      }
       try {
         const token = $cookies.get("Authorization");
         const formData = new FormData();
@@ -343,11 +356,10 @@ export default {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data", // Add Content-Type header
+              "Content-Type": "multipart/form-data",
             },
           }
         );
-        console.log(response);
         this.allComments(taskId);
         this.newComment.comment = "";
         this.newComment.files = null;

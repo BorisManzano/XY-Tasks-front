@@ -61,7 +61,6 @@ export default {
       if (boolean) {
         return this.$swal.fire({
           title: res,
-          icon: "success",
           position: "top",
         });
       } else {
@@ -70,7 +69,6 @@ export default {
     },
 
     async enviarEmail() {
-      console.log(this.email);
       try {
         const response = await axios.post(
           `${process.env.VUE_APP_API_BASE_URL}recoverPassword`,

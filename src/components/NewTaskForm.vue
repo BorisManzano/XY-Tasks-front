@@ -79,12 +79,11 @@ export default {
     showToast(res, boolean) {
       if (boolean) {
         return this.$swal.fire({
-          title: res,
-          icon: "success",
+          text: res,
           position: "top",
         });
       } else {
-        return this.$swal.fire({ text: res, position: "top" });
+        return this.$swal.fire({ text: res, position: "top", icon: "error" });
       }
     },
 
@@ -126,7 +125,7 @@ export default {
         this.task = "";
         this.details = "";
         this.selectedUser = null;
-      } catch (error) {
+      } catch {
         this.showToast("Error al crear la tarea", false);
       }
     },

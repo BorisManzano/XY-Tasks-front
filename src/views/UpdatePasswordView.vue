@@ -68,12 +68,11 @@ export default {
     showToast(res, boolean) {
       if (boolean) {
         return this.$swal.fire({
-          title: res,
-          icon: "success",
+          text: res,
           position: "top",
         });
       } else {
-        return this.$swal.fire({ text: res, position: "top" });
+        return this.$swal.fire({ text: res, position: "top", icon: "error" });
       }
     },
 
@@ -89,9 +88,12 @@ export default {
             }
           );
           this.showToast("Contraseña actualizada con éxito.", true);
-        } catch (error) {
+          this.$router.push({ name: "Login" });
+        } catch {
           this.showToast("Error al actualizar la contraseña", false);
         }
+      } else {
+        this.showToast("Las contraseñas deben ser iguales", false);
       }
     },
   },
