@@ -81,6 +81,18 @@ export default {
   methods: {
     ...mapMutations(["setUser"]),
 
+    showToast(res, boolean) {
+      if (boolean) {
+        return this.$swal.fire({
+          title: res,
+          icon: "success",
+          position: "top",
+        });
+      } else {
+        return this.$swal.fire({ text: res, position: "top" });
+      }
+    },
+
     async login() {
       try {
         const response = await axios.post(
@@ -94,14 +106,13 @@ export default {
         if (response.data.token) {
           $cookies.set("Authorization", response.data.token);
           this.setUser((this.user = response.data.user));
+
           this.$router.push("/home");
         } else {
-          console.error(
-            "Error: No se recibió un token de sesión en la respuesta"
-          );
+          this.showToast("Error al iniciar sesión", false);
         }
-      } catch (error) {
-        console.error("Error al iniciar sesión:", error);
+      } catch {
+        this.showToast("Error al iniciar sesión", false);
       }
     },
   },

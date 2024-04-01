@@ -186,6 +186,18 @@ export default {
   },
   mounted() {},
   methods: {
+    showToast(res, boolean) {
+      if (boolean) {
+        return this.$swal.fire({
+          title: res,
+          icon: "success",
+          position: "top",
+        });
+      } else {
+        return this.$swal.fire({ text: res, position: "top" });
+      }
+    },
+
     async logout() {
       try {
         const token = $cookies.get("Authorization");
@@ -203,8 +215,8 @@ export default {
         this.$nextTick(() => {
           this.$router.push("/login");
         });
-      } catch (error) {
-        console.error("Error al cerrar sesión:", error);
+      } catch {
+        this.showToast("Error al cerrar sesión", false);
       }
     },
   },

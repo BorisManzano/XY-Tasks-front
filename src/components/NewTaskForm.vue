@@ -76,6 +76,18 @@ export default {
     this.allEmployes();
   },
   methods: {
+    showToast(res, boolean) {
+      if (boolean) {
+        return this.$swal.fire({
+          title: res,
+          icon: "success",
+          position: "top",
+        });
+      } else {
+        return this.$swal.fire({ text: res, position: "top" });
+      }
+    },
+
     async allEmployes() {
       const token = $cookies.get("Authorization");
       try {
@@ -88,8 +100,8 @@ export default {
           }
         );
         this.users = response.data;
-      } catch (error) {
-        console.error("Error al obtener los empleados", error);
+      } catch {
+        this.showToast("Error al obtener los empleados", false);
       }
     },
 
@@ -115,7 +127,7 @@ export default {
         this.details = "";
         this.selectedUser = null;
       } catch (error) {
-        console.error("Error al crear la tarea", error);
+        this.showToast("Error al crear la tarea", false);
       }
     },
   },

@@ -57,6 +57,18 @@ export default {
     };
   },
   methods: {
+    showToast(res, boolean) {
+      if (boolean) {
+        return this.$swal.fire({
+          title: res,
+          icon: "success",
+          position: "top",
+        });
+      } else {
+        return this.$swal.fire({ text: res, position: "top", icon: "error" });
+      }
+    },
+
     async enviarEmail() {
       console.log(this.email);
       try {
@@ -66,9 +78,9 @@ export default {
             email: this.email,
           }
         );
-        console.log("Correo electrónico enviado:", response.data);
+        this.showToast("Correo electrónico enviado.", true);
       } catch (error) {
-        console.error("Error al enviar el correo electrónico:", error);
+        this.showToast("Error al enviar el correo electrónico", false);
       }
     },
   },

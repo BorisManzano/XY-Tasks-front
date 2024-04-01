@@ -65,6 +65,18 @@ export default {
     };
   },
   methods: {
+    showToast(res, boolean) {
+      if (boolean) {
+        return this.$swal.fire({
+          title: res,
+          icon: "success",
+          position: "top",
+        });
+      } else {
+        return this.$swal.fire({ text: res, position: "top" });
+      }
+    },
+
     async changePassword() {
       if (this.password === this.repeatPassword) {
         try {
@@ -76,8 +88,9 @@ export default {
               email: this.$route.query.email,
             }
           );
+          this.showToast("Contraseña actualizada con éxito.", true);
         } catch (error) {
-          console.error("Error al cambiar la contraseña:", error);
+          this.showToast("Error al actualizar la contraseña", false);
         }
       }
     },

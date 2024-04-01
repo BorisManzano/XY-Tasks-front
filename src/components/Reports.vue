@@ -51,6 +51,18 @@ export default {
     };
   },
   methods: {
+    showToast(res, boolean) {
+      if (boolean) {
+        return this.$swal.fire({
+          title: res,
+          icon: "success",
+          position: "top",
+        });
+      } else {
+        return this.$swal.fire({ text: res, position: "top" });
+      }
+    },
+
     async generatePDF() {
       if (!this.date || this.date.length !== 2) {
         console.error("Debe seleccionar un rango de fechas válido");
@@ -76,8 +88,8 @@ export default {
         const url = window.URL.createObjectURL(blob);
 
         window.open(url);
-      } catch (error) {
-        console.error("Error al obtener el PDF", error);
+      } catch {
+        this.showToast("Error al obtener el PDF", false);
       }
     },
   },

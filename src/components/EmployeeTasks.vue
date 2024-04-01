@@ -224,6 +224,18 @@ export default {
     this.fetchEmployeeData();
   },
   methods: {
+    showToast(res, boolean) {
+      if (boolean) {
+        return this.$swal.fire({
+          title: res,
+          icon: "success",
+          position: "top",
+        });
+      } else {
+        return this.$swal.fire({ text: res, position: "top" });
+      }
+    },
+
     toggleDropdown(taskId) {
       if (this.activeDropdown === taskId) {
         this.activeDropdown = null;

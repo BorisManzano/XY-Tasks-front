@@ -135,16 +135,58 @@
                           >
                             <div
                               v-for="comment in taskComments"
+                              :key="comment.id"
                               class="flex flex-row text-[#f43f60] gap-0.5"
                             >
                               <div
-                                class="flex flex-row border-[#f43f60] border-2 rounded-lg p-2"
+                                class="flex flex-col border-[#f43f60] border-2 rounded-lg p-2"
                               >
+                                <div
+                                  v-if="
+                                    comment.attachment &&
+                                    comment.attachment.length > 0
+                                  "
+                                >
+                                  <div
+                                    v-if="
+                                      comment.attachment &&
+                                      comment.attachment.length > 0
+                                    "
+                                    class="flex flex-col"
+                                  >
+                                    <div
+                                      v-for="attachment in comment.attachment"
+                                      :key="attachment.id"
+                                    >
+                                      <a
+                                        v-if="isPDF(attachment.filename)"
+                                        :href="attachment.url"
+                                        target="_blank"
+                                      >
+                                        <button
+                                          class="text-[#f43f60] underline font-bold"
+                                        >
+                                          Ver PDF
+                                        </button>
+                                      </a>
+                                      <div
+                                        v-else
+                                        :href="attachment.url"
+                                        target="_blank"
+                                      >
+                                        <img
+                                          :src="attachment.url"
+                                          alt="Attachment"
+                                          class="max-w-60 max-h-60 ml-2"
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
                                 <p class="text-[#f43f60] font-semibold">
                                   {{ comment.comment }}
                                 </p>
                               </div>
-                              {{ console.log(employee) }}
                               <button
                                 v-if="
                                   user.role === 'super_admin' ||
@@ -164,22 +206,40 @@
                           </div>
                         </div>
                         <hr class="border-[#f43f60]" />
-                        <div class="h-12 relative">
+                        <form
+                          @submit.prevent="createComment(task.id)"
+                          enctype="multipart/form-data"
+                          class="h-12 relative"
+                        >
                           <input
                             placeholder="Escribir comentario"
-                            v-model="newComment"
+                            v-model="newComment.comment"
                             id="newComment"
                             type="text"
-                            class="border-none focus:outline-none text-[#f43f60] p-2 rounded-lg w-full h-full"
+                            class="border-none focus:outline-none text-[#f43f60] p-2 pr-20 rounded-lg w-full h-full"
                           />
-                          <button
-                            class="absolute top-4 right-2 fill-[#f43f60] text-[#f43f60] outline-[#f43f60]"
+                          <label
+                            for="fileInput"
+                            class="absolute right-14 fill-[#f43f60] text-[#f43f60] outline-[#f43f60] flex items-center justify-center cursor-pointer"
+                            style="top: 15px"
                           >
-                            <Attach />
-                          </button>
+                            <img
+                              src="../assets/attach.svg"
+                              alt="attach"
+                              width="20"
+                              height="20"
+                            />
+                          </label>
+                          <input
+                            id="fileInput"
+                            type="file"
+                            style="display: none"
+                            @change="handleFileUpload($event)"
+                          />
+
                           <button
-                            @click="createComment(newComment, task.id)"
-                            class="absolute top-4 right-2 fill-[#f43f60] text-[#f43f60] outline-[#f43f60]"
+                            class="absolute right-2 fill-[#f43f60] text-[#f43f60] border rounded-lg p-2 border-[#f43f60] outline-[#f43f60]"
+                            style="top: 6px"
                           >
                             <svg
                               class="w-5 h-5"
@@ -196,7 +256,7 @@
                               ></path>
                             </svg>
                           </button>
-                        </div>
+                        </form>
                       </div>
                     </div>
                   </transition>
@@ -220,17 +280,20 @@ import axios from "axios";
 import { mapState } from "vuex";
 import NewTaskForm from "./NewTaskForm.vue";
 import EmployeeTasks from "./EmployeeTasks.vue";
-import Attach from "../assets/attach.svg";
 
 export default {
   name: "AllTasks",
   data() {
     return {
       taskComments: [],
-      newComment: "",
       employees: [],
       activeDropdown: null,
       activeModal: null,
+      newComment: {
+        comment: "",
+        files: null,
+        task_id: null,
+      },
     };
   },
   computed: {
@@ -247,6 +310,56 @@ export default {
     EmployeeTasks,
   },
   methods: {
+    showToast(res, boolean) {
+      if (boolean) {
+        return this.$swal.fire({
+          title: res,
+          icon: "success",
+          position: "top",
+        });
+      } else {
+        return this.$swal.fire({ text: res, position: "top" });
+      }
+    },
+
+    isPDF(filename) {
+      return filename.toLowerCase().endsWith(".pdf");
+    },
+
+    async createComment(taskId) {
+      this.newComment.task_id = taskId;
+      try {
+        const token = $cookies.get("Authorization");
+        const formData = new FormData();
+        formData.append("comment", this.newComment.comment);
+        formData.append("task_id", taskId);
+        if (this.newComment.files !== null) {
+          formData.append("files[]", this.newComment.files);
+        }
+
+        const response = await axios.post(
+          `${process.env.VUE_APP_API_BASE_URL}newComment`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data", // Add Content-Type header
+            },
+          }
+        );
+        console.log(response);
+        this.allComments(taskId);
+        this.newComment.comment = "";
+        this.newComment.files = null;
+      } catch (error) {
+        this.showToast("Error al crear el comentario", false);
+      }
+    },
+
+    handleFileUpload(event) {
+      this.newComment.files = event.target.files[0];
+    },
+
     toggleDropdown(taskId) {
       if (this.activeDropdown === taskId) {
         this.activeDropdown = null;
@@ -280,7 +393,7 @@ export default {
         );
         this.toggleDropdown(id);
       } catch (error) {
-        console.error("Error al actualizar el estado de la tarea:", error);
+        this.showToast("Error al actualizar el estado de la tarea", false);
       }
     },
     async fetchEmployeesTasks() {
@@ -306,11 +419,11 @@ export default {
           })),
         }));
       } catch (error) {
-        console.error("Error al obtener las tareas de los empleados:", error);
+        this.showToast("Error al obtener las tareas de los empleados", false);
       }
     },
+
     async allComments(id) {
-      console.log(id);
       try {
         const token = $cookies.get("Authorization");
         const response = await axios.get(
@@ -321,10 +434,72 @@ export default {
             },
           }
         );
-        this.taskComments = response.data;
-        console.log(this.taskComments);
+
+        const comments = await Promise.all(
+          response.data.map(async (comment) => {
+            if (comment.has_attachment) {
+              const attachmentResponse = await axios.get(
+                `${process.env.VUE_APP_API_BASE_URL}comments/${comment.id}/attachments`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+
+              const attachments = await Promise.all(
+                attachmentResponse.data.attachments.map(async (attachment) => {
+                  try {
+                    const attachmentDownloadResponse = await axios.get(
+                      `${process.env.VUE_APP_API_BASE_URL}attachments/download/${attachment.id}`,
+                      {
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                        responseType: "blob",
+                      }
+                    );
+
+                    const blob = new Blob([attachmentDownloadResponse.data], {
+                      type: "application/pdf",
+                    });
+                    const url = window.URL.createObjectURL(blob);
+
+                    return {
+                      id: attachment.id,
+                      filename: attachment.filename,
+                      url: url,
+                    };
+                  } catch {
+                    this.showToast("Error al descargar", false);
+                    return null;
+                  }
+                })
+              );
+
+              return {
+                id: comment.id,
+                comment: comment.comment,
+                task_id: comment.task_id,
+                user_id: comment.user_id,
+                attachment: attachments.filter(
+                  (attachment) => attachment !== null
+                ),
+              };
+            } else {
+              return {
+                id: comment.id,
+                comment: comment.comment,
+                task_id: comment.task_id,
+                user_id: comment.user_id,
+              };
+            }
+          })
+        );
+
+        this.taskComments = comments;
       } catch (error) {
-        console.error("Error al obtener los comentarios:", error);
+        this.showToast("Error al obtener los comentarios", false);
       }
     },
 
@@ -341,30 +516,7 @@ export default {
         );
         this.allComments(task_id);
       } catch (error) {
-        console.error("Error al eliminar el comentario:", error);
-      }
-    },
-
-    async createComment(comment, id, files) {
-      try {
-        const token = $cookies.get("Authorization");
-        const response = await axios.post(
-          `${process.env.VUE_APP_API_BASE_URL}newComment`,
-          {
-            comment: comment,
-            task_id: id,
-            files: files,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        this.allComments(id);
-        this.newComment = "";
-      } catch (error) {
-        console.error("Error al crear el comentario", error);
+        this.showToast("Error al eliminar el comentario", false);
       }
     },
   },

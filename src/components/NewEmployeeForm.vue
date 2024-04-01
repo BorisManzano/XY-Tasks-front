@@ -72,6 +72,18 @@ export default {
   },
   mounted() {},
   methods: {
+    showToast(res, boolean) {
+      if (boolean) {
+        return this.$swal.fire({
+          title: res,
+          icon: "success",
+          position: "top",
+        });
+      } else {
+        return this.$swal.fire({ text: res, position: "top" });
+      }
+    },
+
     async newEmployee() {
       const token = $cookies.get("Authorization");
       try {
@@ -91,8 +103,8 @@ export default {
         this.name = "";
         this.email = "";
         this.role = "";
-      } catch (error) {
-        console.error(error);
+      } catch {
+        this.showToast("Error al crear el usuario", false);
       }
     },
   },
